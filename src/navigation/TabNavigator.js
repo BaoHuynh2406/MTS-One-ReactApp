@@ -1,6 +1,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { TouchableOpacity } from 'react-native';
 
 import HomeScreen from '../screens/main/HomeScreen';
 import SettingsScreen from '../screens/main/SettingsScreen';
@@ -14,9 +15,9 @@ const TabNavigator = () => {
         tabBarActiveTintColor: '#3b82f6',
         tabBarInactiveTintColor: '#9ca3af',
         tabBarStyle: {
-          paddingBottom: 8,
-          paddingTop: 8,
-          height: 60,
+          paddingBottom: 10,
+          paddingTop: 10,
+          height: 100,
         },
         headerStyle: {
           backgroundColor: '#3b82f6',
@@ -32,7 +33,12 @@ const TabNavigator = () => {
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="home" color={color} size={size} />
           ),
-          title: 'Trang chủ',
+          title: 'MTS One',
+          headerRight: () => (
+            <TouchableOpacity onPress={() => alert('Thông báo')} style={{marginRight: 15}}>
+              <MaterialCommunityIcons name="bell" size={24} color="white" />
+            </TouchableOpacity>
+          ),
         }}
       />
       <Tab.Screen

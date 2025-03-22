@@ -1,16 +1,20 @@
 import React from 'react';
 import { View, ScrollView } from 'react-native';
-import { List, Switch, Text, Divider, Button, Avatar } from 'react-native-paper';
+import { List, Text, Divider, Button, Avatar } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { logout } from '../../store/authSlice';
+import { logoutAsync } from '../../store/authSlice';
 
 const SettingsScreen = () => {
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.auth);
+  const { user, loading } = useSelector((state) => state.auth);
 
-  const handleLogout = () => {
-    dispatch(logout());
+  const handleLogout = async () => {
+    try {
+      await dispatch(logoutAsync()).unwrap();
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
 
   return (
@@ -54,12 +58,14 @@ const SettingsScreen = () => {
           <Button 
             mode="contained" 
             onPress={handleLogout}
+            loading={loading}
+            disabled={loading}
             className="mt-4 rounded-lg flex items-center justify-center"
             style={{ backgroundColor: '#ef4444' }}
             labelStyle={{ fontSize: 16, fontWeight: 'bold', textAlign: 'center' }}
             contentStyle={{ height: 50, alignItems: 'center', justifyContent: 'center' }}
           >
-            Đăng xuất
+            {loading ? 'Đang đăng xuất...' : 'Đăng xuất'}
           </Button>
 
           <Text className="text-center text-gray-400 mt-6">
@@ -71,4 +77,4 @@ const SettingsScreen = () => {
   );
 };
 
-export default SettingsScreen; 
+export default SettingsScreen;

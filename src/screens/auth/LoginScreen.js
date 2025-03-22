@@ -1,21 +1,30 @@
-import React, { useState } from 'react';
-import { View, ImageBackground, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { TextInput, Button, Text, Avatar } from 'react-native-paper';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { login } from '../../store/authSlice';
+import { loginAsync, clearError } from '../../store/authSlice';
 
 const LoginScreen = () => {
+  const dispatch = useDispatch();
+  const { loading, error } = useSelector((state) => state.auth);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [secureTextEntry, setSecureTextEntry] = useState(true);
-  const dispatch = useDispatch();
 
-  const handleLogin = () => {
-    // Xử lý đăng nhập - trong thực tế sẽ gọi API
-    // Ở đây chỉ giả lập đăng nhập thành công
-    dispatch(login({ email }));
+  useEffect(() => {
+    // Clear any existing errors when component mounts
+    dispatch(clearError());
+  }, [dispatch]);
+
+  const handleLogin = async () => {
+    try {
+      await dispatch(loginAsync({ email, password })).unwrap();
+    } catch (error) {
+      // Error handling is managed by the slice
+      console.error('Login failed:', error);
+    }
   };
 
   return (
@@ -69,15 +78,23 @@ const LoginScreen = () => {
           />
         </View>
 
+        {error && (
+          <Text className="text-red-500 text-center mb-4">
+            {error}
+          </Text>
+        )}
+
         <Button
           mode="contained"
           onPress={handleLogin}
+          loading={loading}
+          disabled={loading}
           style={styles.loginButton}
           contentStyle={styles.buttonContent}
           labelStyle={styles.buttonLabel}
           className="rounded-lg"
         >
-          Đăng nhập
+          {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
         </Button>
 
         <TouchableOpacity style={styles.forgotPassword} className="mt-4">
@@ -168,4 +185,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoginScreen; 
+export default LoginScreen;

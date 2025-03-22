@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useSelector } from 'react-redux';
@@ -19,63 +19,92 @@ const Stack = createNativeStackNavigator();
 const AppNavigator = () => {
   const { isAuthenticated, loading } = useSelector((state) => state.auth);
 
-  if (loading) {
-    return <SplashScreen />;
-  }
-
   return (
     <SafeAreaProvider>
       <NavigationContainer>
-        {!isAuthenticated ? (
-          <Stack.Navigator screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="Splash" component={SplashScreen} />
-            <Stack.Screen name="Login" component={LoginScreen} />
-          </Stack.Navigator>
-        ) : (
-          <Stack.Navigator 
-            screenOptions={{ 
-              headerShown: true, 
-              headerStyle: { backgroundColor: '#3b82f6' }, 
-              headerTintColor: '#fff',
-              headerRight: () => (
-                <TouchableOpacity onPress={() => alert('Thông báo')}>
-                  <MaterialCommunityIcons name="bell" size={24} color="white" style={{marginRight: 15}} />
-                </TouchableOpacity>
-              )
-            }}
-          >
-            <Stack.Screen 
-              name="Trang chủ" 
-              component={TabNavigator} 
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen 
-              name="DonSan" 
-              component={DonSanScreen} 
-              options={{ 
-                title: 'Đơn sàn'
-              }}
-            />
-            <Stack.Screen 
-              name="HoaToc" 
-              component={HoaTocScreen} 
-              options={{ title: 'Hoả tốc' }}
-            />
-            <Stack.Screen 
-              name="GiaoHang" 
-              component={GiaoHangScreen} 
-              options={{ title: 'Giao Hàng' }}
-            />
-            <Stack.Screen 
-              name="ThongKeGiaoHang" 
-              component={ThongKeGiaoHangScreen} 
-              options={{ title: 'Thống kê giao hàng' }}
-            />
-          </Stack.Navigator>
-        )}
+        <Stack.Navigator>
+          {!isAuthenticated ? (
+            <>
+              <Stack.Screen 
+                name="Splash" 
+                component={SplashScreen} 
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen 
+                name="Login" 
+                component={LoginScreen} 
+                options={{ headerShown: false }}
+              />
+            </>
+          ) : (
+            <>
+              <Stack.Screen 
+                name="Trang chủ" 
+                component={TabNavigator} 
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen 
+                name="DonSan" 
+                component={DonSanScreen} 
+                options={{ 
+                  title: 'Đơn sàn',
+                  headerStyle: { backgroundColor: '#3b82f6' }, 
+                  headerTintColor: '#fff',
+                  headerRight: () => (
+                    <TouchableOpacity onPress={() => alert('Thông báo')}>
+                      <MaterialCommunityIcons name="bell" size={24} color="white" style={{marginRight: 15}} />
+                    </TouchableOpacity>
+                  )
+                }}
+              />
+              <Stack.Screen 
+                name="HoaToc" 
+                component={HoaTocScreen} 
+                options={{ 
+                  title: 'Hoả tốc',
+                  headerStyle: { backgroundColor: '#3b82f6' }, 
+                  headerTintColor: '#fff',
+                  headerRight: () => (
+                    <TouchableOpacity onPress={() => alert('Thông báo')}>
+                      <MaterialCommunityIcons name="bell" size={24} color="white" style={{marginRight: 15}} />
+                    </TouchableOpacity>
+                  )
+                }}
+              />
+              <Stack.Screen 
+                name="GiaoHang" 
+                component={GiaoHangScreen} 
+                options={{ 
+                  title: 'Giao Hàng',
+                  headerStyle: { backgroundColor: '#3b82f6' }, 
+                  headerTintColor: '#fff',
+                  headerRight: () => (
+                    <TouchableOpacity onPress={() => alert('Thông báo')}>
+                      <MaterialCommunityIcons name="bell" size={24} color="white" style={{marginRight: 15}} />
+                    </TouchableOpacity>
+                  )
+                }}
+              />
+              <Stack.Screen 
+                name="ThongKeGiaoHang" 
+                component={ThongKeGiaoHangScreen} 
+                options={{ 
+                  title: 'Thống kê giao hàng',
+                  headerStyle: { backgroundColor: '#3b82f6' }, 
+                  headerTintColor: '#fff',
+                  headerRight: () => (
+                    <TouchableOpacity onPress={() => alert('Thông báo')}>
+                      <MaterialCommunityIcons name="bell" size={24} color="white" style={{marginRight: 15}} />
+                    </TouchableOpacity>
+                  )
+                }}
+              />
+            </>
+          )}
+        </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
   );
 };
 
-export default AppNavigator; 
+export default AppNavigator;

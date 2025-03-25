@@ -5,18 +5,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export const userApiService = {
   /**
    * Login with email and password
-   * @param {string} email 
+   * @param {string} username 
    * @param {string} password 
    * @returns {Promise<{access_token: string, refresh_token: string, user: UserModel}>}
    */
-  async login(email, password) {
+  async login(username, password) {
     try {
       const response = await api.public.post('/api/v1/auth/login', {
-        email,
+        username,
         password
       });
 
-      console.log(response.data);
       if (!response.data.success) {
         throw new Error(response.data.message || 'Login failed');
       }

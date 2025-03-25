@@ -18,21 +18,24 @@ export class UserModel {
     this.email = data.email || '';
     this.phone = data.phone || '';
     this.gender = data.gender || 'other';
-    this.dateOfBirth = data.dateOfBirth || new Date();
-    this.createdAt = data.createdAt || new Date();
-    this.lastLoginAt = data.lastLoginAt || new Date();
+    // Giữ nguyên dạng string cho các trường datetime
+    this.dateOfBirth = data.dateOfBirth || '';
+    this.createdAt = data.createdAt || '';
+    this.lastLoginAt = data.lastLoginAt || '';
     this.roles = data.roles || [];
     this.active = data.active ?? true;
   }
 
   // Helper method to convert API response to User model
   static fromJSON(json) {
-    return new UserModel({
+    // Trả về plain object thay vì instance của class
+    return {
       ...json,
-      dateOfBirth: new Date(json.dateOfBirth),
-      createdAt: new Date(json.createdAt),
-      lastLoginAt: new Date(json.lastLoginAt),
-    });
+      // Đảm bảo các trường datetime là string
+      dateOfBirth: json.dateOfBirth || '',
+      createdAt: json.createdAt || '',
+      lastLoginAt: json.lastLoginAt || ''
+    };
   }
 
   // Helper method to convert User model to plain object
@@ -50,5 +53,11 @@ export class UserModel {
       roles: this.roles,
       active: this.active,
     };
+  }
+
+  // Thêm phương thức để format date khi cần hiển thị
+  static formatDate(dateString) {
+    if (!dateString) return '';
+    return new Date(dateString).toLocaleDateString('vi-VN');
   }
 }

@@ -4,9 +4,10 @@ import userApiService from '../service/userApiService';
 // Async thunk for login
 export const loginAsync = createAsyncThunk(
   'auth/loginAsync',
-  async ({ email, password }, { rejectWithValue }) => {
+  async ({ username, password }, { rejectWithValue }) => {
     try {
-      const response = await userApiService.login(email, password);
+      const response = await userApiService.login(username, password);
+      // Return plain object instead of class instance
       return response.user;
     } catch (error) {
       return rejectWithValue(error.message || 'Login failed');
@@ -63,6 +64,7 @@ export const authSlice = createSlice({
       })
       .addCase(loginAsync.fulfilled, (state, action) => {
         state.isAuthenticated = true;
+        // Store plain object
         state.user = action.payload;
         state.loading = false;
         state.error = null;

@@ -13,6 +13,7 @@ import DonSanScreen from '../screens/main/DonSanScreen';
 import HoaTocScreen from '../screens/main/HoaTocScreen';
 import GiaoHangScreen from '../screens/main/GiaoHangScreen';
 import ThongKeGiaoHangScreen from '../screens/main/ThongKeGiaoHangScreen';
+import UserProfileScreen from '../screens/main/UserProfileScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -97,6 +98,15 @@ const AppNavigator = () => {
                       <MaterialCommunityIcons name="bell" size={24} color="white" style={{marginRight: 15}} />
                     </TouchableOpacity>
                   )
+                }}
+              />
+              <Stack.Screen 
+                name="UserProfile" 
+                component={UserProfileScreen} 
+                options={{ 
+                  title: 'Hồ sơ người dùng',
+                  headerStyle: { backgroundColor: '#3b82f6' }, 
+                  headerTintColor: '#fff',
                 }}
               />
             </>

@@ -1,6 +1,9 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import env from './env';
+import { store } from '@/store';
+import { logoutAsync } from '@/store/authSlice';
+import { Alert } from 'react-native';
 
 // Create axios instance without auth
 export const publicApi = axios.create({
@@ -57,12 +60,14 @@ privateApi.interceptors.response.use(
 
       try {
         const refreshToken = await AsyncStorage.getItem('refresh_token');
-        const response = await publicApi.post('/auth/refresh', { 
-          refresh_token: refreshToken 
+        const response = await publicApi.post('/api/v1/auth/refresh-token', {}, { 
+          headers: {
+            'Authorization': `Bearer ${refreshToken}`
+          }
         });
         
-        const { access_token, refresh_token } = response.data;
-        
+        const { access_token, refresh_token } = response.data.data;
+
         await AsyncStorage.setItem('access_token', access_token);
         await AsyncStorage.setItem('refresh_token', refresh_token);
 
@@ -75,9 +80,11 @@ privateApi.interceptors.response.use(
       } catch (err) {
         isRefreshing = false;
         refreshQueue = [];
-        await AsyncStorage.multiRemove(['access_token', 'refresh_token']);
-        // Redirect to login or dispatch logout action
-        alert('Your session has expired. Please login again.');
+        
+        // Logout user if refresh token fails
+        Alert('Phiên đăng nhập hết hạn, vui lòng đăng nhập lại');
+        await store.dispatch(logoutAsync());
+        
         return Promise.reject(err);
       }
     }

@@ -97,10 +97,12 @@ export const authSlice = createSlice({
         state.user = action.payload;
         state.loading = false;
         state.error = null;
+        state.isAuthenticated = true;
       })
       .addCase(getCurrentUserAsync.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        state.isAuthenticated = false;
       });
   },
 });

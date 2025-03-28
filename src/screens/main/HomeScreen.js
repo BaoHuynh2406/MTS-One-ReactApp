@@ -68,9 +68,26 @@ const HomeScreen = () => {
               </View>
             </View>
           </View>
+
+           {/* Nhóm 3: Test */}
+          <View>
+              <Text className="text-lg font-bold text-gray-800 mb-3">Test Room</Text>
+              <View className="flex-row justify-between">          
+                <TouchableOpacity 
+                  className="bg-white rounded-xl p-4 items-center justify-center w-[48%] shadow-sm"
+                  onPress={() => navigation.navigate('TestScreen')}
+                >
+                  <View className="bg-purple-100 p-3 rounded-full mb-2">
+                    <MaterialCommunityIcons name="code-braces" size={30} color="#8b5cf6" />
+                  </View>
+                  <Text className="text-gray-800 font-medium">Test</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
           
          
-        </View>
+ 
       </ScrollView>
     </SafeAreaView>
   );

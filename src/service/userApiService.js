@@ -49,8 +49,9 @@ export const userApiService = {
     } catch (error) {
       // Still remove tokens even if API call fails
       await AsyncStorage.multiRemove(['access_token', 'refresh_token']);
-      throw error?.response?.data || error;
     }
+
+    // cuối cùng chuyển sang màn hình login
   },
 
   /**
@@ -59,7 +60,7 @@ export const userApiService = {
    */
   async getCurrentUser() {
     try {
-      const response = await api.private.get('/user/profile');
+      const response = await api.private.get('/api/v1/users/my-info');
       return UserModel.fromJSON(response.data);
     } catch (error) {
       throw error?.response?.data || error;

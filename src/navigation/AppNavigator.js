@@ -14,6 +14,7 @@ import HoaTocScreen from '../screens/main/HoaTocScreen';
 import GiaoHangScreen from '../screens/main/GiaoHangScreen';
 import ThongKeGiaoHangScreen from '../screens/main/ThongKeGiaoHangScreen';
 import UserProfileScreen from '../screens/main/UserProfileScreen';
+import TestScreen from '@/screens/test/TestScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -105,6 +106,15 @@ const AppNavigator = () => {
                 component={UserProfileScreen} 
                 options={{ 
                   title: 'Hồ sơ người dùng',
+                  headerStyle: { backgroundColor: '#3b82f6' }, 
+                  headerTintColor: '#fff',
+                }}
+              />
+               <Stack.Screen 
+                name="TestScreen" 
+                component={TestScreen} 
+                options={{ 
+                  title: 'Màn Hình Test',
                   headerStyle: { backgroundColor: '#3b82f6' }, 
                   headerTintColor: '#fff',
                 }}

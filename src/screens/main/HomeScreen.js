@@ -5,15 +5,16 @@ import { useSelector } from 'react-redux';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import SafeAreaWrapper from '@/components/SafeAreaWrapper';
 
 const HomeScreen = () => {
   const { user } = useSelector((state) => state.auth);
   const navigation = useNavigation();
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-100">
+    <SafeAreaWrapper className="flex-1 bg-gray-100">
       <ScrollView>
-        <View className="px-4">
+        <View className="px-4 py-5">
           {/* Nhóm icon điều hướng */}
           <View className="mb-6">
             {/* Nhóm 1: Sàn Thương mại điện tử */}
@@ -89,7 +90,7 @@ const HomeScreen = () => {
          
  
       </ScrollView>
-    </SafeAreaView>
+    </SafeAreaWrapper>
   );
 };
 

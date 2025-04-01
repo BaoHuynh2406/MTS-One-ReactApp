@@ -15,6 +15,7 @@ import GiaoHangScreen from '../screens/main/GiaoHangScreen';
 import ThongKeGiaoHangScreen from '../screens/main/ThongKeGiaoHangScreen';
 import UserProfileScreen from '../screens/main/UserProfileScreen';
 import TestScreen from '@/screens/test/TestScreen';
+import ExpressOrderScreen from '../screens/main/ExpressOrder/ExpressOrderScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -71,6 +72,13 @@ const AppNavigator = () => {
                       <MaterialCommunityIcons name="bell" size={24} color="white" style={{marginRight: 15}} />
                     </TouchableOpacity>
                   )
+                }}
+              />
+              <Stack.Screen 
+                name="ExpressOrder" 
+                component={ExpressOrderScreen} 
+                options={{ 
+                  headerShown: false,
                 }}
               />
               <Stack.Screen 

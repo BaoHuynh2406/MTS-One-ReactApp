@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { View, ScrollView } from 'react-native';
+import { View, ScrollView, TouchableOpacity } from 'react-native';
 import { Button, Text } from 'react-native-paper';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import ScannerCameraAdvanced from '@/components/ui/ScannerCameraAdvanced';
 import ProductsCard from '@/components/ui/ProductsCard';
 import CustomInputPopup from '@/components/ui/CustomInputPopup';
 import SafeAreaWrapper from '@/components/SafeAreaWrapper';
 
-const HoaTocScreen = () => {
+const HoaTocScreen = ({ navigation }) => {
   const [selectedItem, setSelectedItem] = useState(null);
 
   // Example search function - replace with your API call
@@ -40,39 +41,23 @@ const HoaTocScreen = () => {
     console.log('Selected:', item);
   };
 
+  const handleStartExpressOrder = () => {
+    navigation.navigate('ExpressOrder');
+  };
+
   return (
     <SafeAreaWrapper>
-      <ScannerCameraAdvanced
-        onScan={({ type, data }) => {
-          console.log('Loại mã:', type);
-          console.log('Dữ liệu:', data);
-        }}
-      />
-
-      <View className="absolute top-[25vh] right-4 z-50">
-        <CustomInputPopup
-          onSelect={handleSelect}
-          onSearch={handleSearch}
-          placeholder="Nhập tên sản phẩm hoặc SKU"
-          buttonSize={20}
-          buttonColor="#3b82f6"
-        />
-      </View>
-      <ProductsCard />
-      <View className="flex-1 p-6">
-        <Button 
-          mode="contained"
-          // onPress={handleConfirm}
-          // disabled={!selectedItem}
-          className={"rounded-xl py-2"}
-          contentStyle={{ height: 48 }}
-          labelStyle={{ fontSize: 16, fontWeight: 'bold' }}
-          style={{
-            backgroundColor: '#3b82f6',
-          }}
+      <View className="flex-1 p-6 space-y-4">
+      
+        <TouchableOpacity 
+          className="flex-row items-center justify-center bg-green-600 rounded-xl py-3 mt-4"
+          onPress={handleStartExpressOrder}
         >
-          Tiếp tục
-        </Button>
+          <MaterialCommunityIcons name="lightning-bolt" size={24} color="white" />
+          <Text className="text-white font-bold text-base ml-2">
+            Quy trình Hoả tốc mới
+          </Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaWrapper>
   );

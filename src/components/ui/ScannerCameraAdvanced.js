@@ -6,8 +6,8 @@ import { Audio } from 'expo-av';
 
 const { height, width } = Dimensions.get('window');
 const SCANNER_HEIGHT = height / 3.33;
-const SCAN_AREA_WIDTH = width * 0.8;
-const SCAN_AREA_HEIGHT = 180;
+const SCAN_AREA_WIDTH = width * 0.7;
+const SCAN_AREA_HEIGHT = SCANNER_HEIGHT * 0.5;
 
 const ScannerCameraAdvanced = ({ onScan }) => {
   const [permission, requestPermission] = useCameraPermissions();

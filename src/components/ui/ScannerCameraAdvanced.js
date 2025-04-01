@@ -255,9 +255,9 @@ const ScannerCameraAdvanced = ({ onScan }) => {
       {scanResult && (
         <View style={{
           position: 'absolute',
-          bottom: 10,
-          left: 20,
-          right: 20,
+          top: 5,
+          left: 60,
+          right: 60,
           backgroundColor: 'rgba(59,130,246,0.9)',
           padding: 15,
           borderRadius: 12,

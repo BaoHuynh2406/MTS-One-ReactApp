@@ -77,7 +77,7 @@ const ScanProductsStep = ({ orderData, scannedProducts, onProductScanned, onComp
       // Thông báo nếu đã vượt quá số lượng mong muốn (nhưng vẫn cho phép quét)
       if (scannedCount >= productInOrder.quantity) {
         playSuccessSound(); // Vẫn sử dụng success sound
-        Alert.alert('Thông báo', `Sản phẩm "${productInfo.name}" đã vượt quá số lượng yêu cầu (${productInOrder.quantity}). Hiện tại: ${scannedCount + 1}.`);
+      
       }
       
       // Thêm vào danh sách đã quét (không giới hạn số lượng)
@@ -92,7 +92,6 @@ const ScanProductsStep = ({ orderData, scannedProducts, onProductScanned, onComp
       // Phát âm thanh và hiển thị thông báo nếu chưa vượt quá số lượng
       if (scannedCount < productInOrder.quantity) {
         playSuccessSound();
-        Alert.alert('Quét thành công', `Đã quét: ${productInfo.name}`);
       }
       
       // Kiểm tra xem đã quét đủ số lượng của tất cả sản phẩm chưa

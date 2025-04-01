@@ -6,10 +6,6 @@
   @apply flex-1;
 }
 
-.shadow-card {
-  @apply shadow-md rounded-lg bg-white;
-}
-
 .btn-primary {
   @apply bg-blue-500 py-3 px-4 rounded-lg;
 }

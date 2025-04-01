@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Alert, Platform } from 'react-native';
+import { View, StyleSheet, Alert, Image, Dimensions } from 'react-native';
 import { Text, Button, IconButton } from 'react-native-paper';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const TakePhotoStep = ({ onComplete, onBack }) => {
     const [permission, requestPermission] = useCameraPermissions();
     const [camera, setCamera] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [photo, setPhoto] = useState(null);
 
     useEffect(() => {
         requestPermission();
@@ -29,7 +32,7 @@ const TakePhotoStep = ({ onComplete, onBack }) => {
             });
 
             if (photo) {
-                onComplete(photo);
+                setPhoto(photo);
             }
         } catch (error) {
             console.error('Error taking picture:', error);
@@ -39,182 +42,141 @@ const TakePhotoStep = ({ onComplete, onBack }) => {
         }
     };
 
+    const handleConfirm = () => {
+        if (photo) {
+            onComplete(photo);
+        }
+    };
+
+    const handleRetake = () => {
+        setPhoto(null);
+    };
+
     if (!permission) {
         return (
-            <View style={styles.container}>
-                <Text>Đang yêu cầu quyền truy cập camera...</Text>
+            <View className="flex-1 justify-center items-center p-6 bg-gray-50">
+                <Text className="text-gray-600 text-lg">
+                    Đang yêu cầu quyền truy cập camera...
+                </Text>
             </View>
         );
     }
 
     if (!permission.granted) {
         return (
-            <View style={styles.container}>
-                <Text>Không có quyền truy cập camera</Text>
+            <View className="flex-1 justify-center items-center p-6 bg-gray-50">
+                <MaterialCommunityIcons name="camera-off" size={80} color="#9ca3af" />
+                <Text className="text-gray-600 text-center text-lg font-medium mt-4 mb-6">
+                    Chúng tôi cần quyền truy cập camera để chụp ảnh bàn giao
+                </Text>
                 <Button 
                     mode="contained" 
                     onPress={requestPermission}
-                    style={styles.button}
+                    className="rounded-full"
+                    buttonColor="#3b82f6"
                 >
-                    Cấp quyền truy cập
+                    Cấp quyền camera
                 </Button>
             </View>
         );
     }
 
     return (
-        <View style={styles.container}>
-            <View style={styles.header}>
+        <View style={{ flex: 1, height: SCREEN_HEIGHT }} className="bg-white">
+            {/* Header */}
+            <View className="flex-row items-center p-4 ">
                 <IconButton
                     icon="arrow-left"
                     size={24}
                     onPress={onBack}
-                    style={styles.backButton}
+                    className="m-0"
+                    iconColor="black"
                 />
-                <Text style={styles.title}>Chụp ảnh bàn giao</Text>
+                <Text className="text-lg font-bold text-white ml-2">
+                    Chụp ảnh bàn giao
+                </Text>
             </View>
 
-            <View style={styles.cameraContainer}>
-                <CameraView
-                    ref={ref => setCamera(ref)}
-                    style={styles.camera}
-                    facing="back"
-                >
-                    <View style={styles.overlay}>
-                        <View style={styles.scanFrame}>
-                            <View style={styles.cornerTopLeft} />
-                            <View style={styles.cornerTopRight} />
-                            <View style={styles.cornerBottomLeft} />
-                            <View style={styles.cornerBottomRight} />
+            {/* Camera or Photo Preview */}
+            <View style={{ flex: 1, height: SCREEN_HEIGHT * 0.75 }}>
+                {photo ? (
+                    <View className="flex-1 relative bg-white">
+                        <Image 
+                            source={{ uri: photo.uri }} 
+                            style={{ flex: 1, height: '100%' }}
+                            resizeMode="contain" 
+                        />
+                        <View className="absolute bottom-0 left-0 right-0 p-6 bg-black/50">
+                            <View className="flex-row justify-center space-x-4">
+                                <Button 
+                                    mode="contained" 
+                                    onPress={handleRetake}
+                                    icon="camera-retake"
+                                    className="rounded-full"
+                                    buttonColor="#f43f5e"
+                                    contentStyle={{ paddingHorizontal: 8 }}
+                                >
+                                    Chụp lại
+                                </Button>
+                            </View>
                         </View>
-                        <Text style={styles.instruction}>
-                            Đặt sản phẩm trong khung để chụp ảnh
-                        </Text>
                     </View>
-                </CameraView>
+                ) : (
+                    <CameraView
+                        ref={ref => setCamera(ref)}
+                        style={StyleSheet.absoluteFillObject}
+                        facing="back"
+                        autoFocus="on"
+                    >
+                        <View className="flex-1 justify-end p-6">
+                            <Text style={{color: '#fff', textAlign: 'center'}} className="text-white text-center text-lg mb-6">
+                                Đặt phiếu bàn giao vào giữa khung hình để chụp ảnh
+                            </Text>
+                            <Button
+                                mode="outlined"
+                                onPress={takePicture}
+                                loading={isLoading}
+                                disabled={isLoading}
+                                icon="camera"
+                                className="rounded-full mb-6 mx-auto w-40"
+                                textColor="white"
+                                buttonColor="transparent"
+                                style={{ borderColor: 'white' }}
+                                contentStyle={{ paddingHorizontal: 16 }}
+                            >
+                                Chụp ảnh
+                            </Button>
+                        </View>
+                    </CameraView>
+                )}
             </View>
 
-            <View style={styles.controls}>
-                <Button
-                    mode="contained"
-                    onPress={takePicture}
-                    loading={isLoading}
-                    disabled={isLoading}
-                    style={styles.captureButton}
-                    icon="camera"
-                >
-                    Chụp ảnh
-                </Button>
-            </View>
+            {/* Footer */}
+            {photo && (
+                <View className="p-4 ">
+                    <Button
+                        mode="contained"
+                        onPress={handleConfirm}
+                        className="rounded-full"
+                        icon="arrow-right"
+                        contentStyle={{ flexDirection: 'row-reverse', paddingVertical: 6 }}
+                        buttonColor="#3b82f6"
+                    >
+                        Tiếp tục
+                    </Button>
+                </View>
+            )}
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        padding: 16,
-        borderBottomWidth: 1,
-        borderBottomColor: '#e5e7eb',
-    },
-    backButton: {
-        marginRight: 8,
-    },
-    title: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#000',
-    },
-    cameraContainer: {
-        flex: 1,
-        position: 'relative',
-    },
-    camera: {
-        flex: 1,
-    },
-    overlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    scanFrame: {
-        width: 300,
-        height: 300,
-        position: 'relative',
-        borderWidth: 2,
-        borderColor: '#fff',
-        borderRadius: 12,
-    },
-    cornerTopLeft: {
+    absoluteFillObject: {
         position: 'absolute',
-        top: -2,
-        left: -2,
-        width: 20,
-        height: 20,
-        borderTopWidth: 4,
-        borderLeftWidth: 4,
-        borderColor: '#fff',
-        borderTopLeftRadius: 12,
-    },
-    cornerTopRight: {
-        position: 'absolute',
-        top: -2,
-        right: -2,
-        width: 20,
-        height: 20,
-        borderTopWidth: 4,
-        borderRightWidth: 4,
-        borderColor: '#fff',
-        borderTopRightRadius: 12,
-    },
-    cornerBottomLeft: {
-        position: 'absolute',
-        bottom: -2,
-        left: -2,
-        width: 20,
-        height: 20,
-        borderBottomWidth: 4,
-        borderLeftWidth: 4,
-        borderColor: '#fff',
-        borderBottomLeftRadius: 12,
-    },
-    cornerBottomRight: {
-        position: 'absolute',
-        bottom: -2,
-        right: -2,
-        width: 20,
-        height: 20,
-        borderBottomWidth: 4,
-        borderRightWidth: 4,
-        borderColor: '#fff',
-        borderBottomRightRadius: 12,
-    },
-    instruction: {
-        color: '#fff',
-        fontSize: 16,
-        marginTop: 20,
-        textAlign: 'center',
-        paddingHorizontal: 20,
-    },
-    controls: {
-        padding: 16,
-        flexDirection: 'row',
-        justifyContent: 'center',
-    },
-    captureButton: {
-        width: '100%',
-        height: 50,
-        borderRadius: 25,
-        justifyContent: 'center',
-    },
-    button: {
-        marginTop: 16,
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
     },
 });
 

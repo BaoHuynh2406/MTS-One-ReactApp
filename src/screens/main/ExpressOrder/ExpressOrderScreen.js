@@ -4,8 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import ScanOrderStep from './ScanOrderStep';
 import ScanProductsStep from './ScanProductsStep';
+import PhoneNumberStep from './PhoneNumberStep';
 import TakePhotoStep from './TakePhotoStep';
-import SummaryStep from './SummaryStep';
 import StepIndicator from './StepIndicator';
 
 const ExpressOrderScreen = ({ navigation }) => {
@@ -13,6 +13,8 @@ const ExpressOrderScreen = ({ navigation }) => {
   const [orderData, setOrderData] = useState(null);
   const [scannedProducts, setScannedProducts] = useState([]);
   const [deliveryImage, setDeliveryImage] = useState(null);
+  const [phoneNumberImage, setPhoneNumberImage] = useState(null);
+  const [phoneNumber, setPhoneNumber] = useState('');
 
   useEffect(() => {
     // Reset state khi màn hình được mở
@@ -20,6 +22,8 @@ const ExpressOrderScreen = ({ navigation }) => {
       setOrderData(null);
       setScannedProducts([]);
       setDeliveryImage(null);
+      setPhoneNumberImage(null);
+      setPhoneNumber('');
     };
   }, []);
 
@@ -30,7 +34,9 @@ const ExpressOrderScreen = ({ navigation }) => {
       // await orderService.saveExpressOrder({
       //   orderData,
       //   scannedProducts,
-      //   deliveryImage
+      //   deliveryImage,
+      //   phoneNumberImage,
+      //   phoneNumber
       // });
       
       // Hiển thị thông báo thành công
@@ -71,8 +77,20 @@ const ExpressOrderScreen = ({ navigation }) => {
                 setScannedProducts(prev => [...prev, product]);
               }
             }}
-            onComplete={() => setCurrentStep('TAKE_PHOTO')}
+            onComplete={() => setCurrentStep('PHONE_NUMBER')}
             navigation={navigation}
+          />
+        );
+      
+      case 'PHONE_NUMBER':
+        return (
+          <PhoneNumberStep
+            onComplete={(data) => {
+              setPhoneNumberImage(data.image);
+              setPhoneNumber(data.phoneNumber);
+              setCurrentStep('TAKE_PHOTO');
+            }}
+            onBack={() => setCurrentStep('SCAN_PRODUCTS')}
           />
         );
       
@@ -81,20 +99,9 @@ const ExpressOrderScreen = ({ navigation }) => {
           <TakePhotoStep
             onComplete={(image) => {
               setDeliveryImage(image);
-              setCurrentStep('SUMMARY');
+              saveExpressOrder();
             }}
-            onBack={() => setCurrentStep('SCAN_PRODUCTS')}
-          />
-        );
-      
-      case 'SUMMARY':
-        return (
-          <SummaryStep
-            orderData={orderData}
-            scannedProducts={scannedProducts}
-            deliveryImage={deliveryImage}
-            onComplete={saveExpressOrder}
-            onBack={() => setCurrentStep('TAKE_PHOTO')}
+            onBack={() => setCurrentStep('PHONE_NUMBER')}
           />
         );
       
@@ -121,8 +128,8 @@ const ExpressOrderScreen = ({ navigation }) => {
         steps={[
           { key: 'SCAN_ORDER', label: 'Quét đơn' },
           { key: 'SCAN_PRODUCTS', label: 'Quét sản phẩm' },
-          { key: 'TAKE_PHOTO', label: 'Chụp ảnh' },
-          { key: 'SUMMARY', label: 'Xác nhận' }
+          { key: 'PHONE_NUMBER', label: 'SĐT' },
+          { key: 'TAKE_PHOTO', label: 'Ảnh giao' }
         ]} 
       />
       

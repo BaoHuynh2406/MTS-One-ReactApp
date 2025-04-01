@@ -6,16 +6,15 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { TouchableOpacity } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import SplashScreen from '../screens/auth/SplashScreen';
-import LoginScreen from '../screens/auth/LoginScreen';
+import SplashScreen from '@/screens/auth/SplashScreen';
+import LoginScreen from '@/screens/auth/LoginScreen';
 import TabNavigator from './TabNavigator';
-import DonSanScreen from '../screens/main/DonSanScreen';
-import HoaTocScreen from '../screens/main/HoaTocScreen';
-import GiaoHangScreen from '../screens/main/GiaoHangScreen';
-import ThongKeGiaoHangScreen from '../screens/main/ThongKeGiaoHangScreen';
-import UserProfileScreen from '../screens/main/UserProfileScreen';
+import DonSanScreen from '@/screens/main/DonSanScreen';
+import GiaoHangScreen from '@/screens/main/GiaoHangScreen';
+import ThongKeGiaoHangScreen from '@/screens/main/ThongKeGiaoHangScreen';
+import UserProfileScreen from '@/screens/main/UserProfileScreen';
 import TestScreen from '@/screens/test/TestScreen';
-import ExpressOrderScreen from '../screens/main/ExpressOrder/ExpressOrderScreen';
+import ExpressOrderScreen from '@/screens/main/ExpressOrder/ExpressOrderScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -51,20 +50,6 @@ const AppNavigator = () => {
                 component={DonSanScreen} 
                 options={{ 
                   title: 'Đơn sàn',
-                  headerStyle: { backgroundColor: '#3b82f6' }, 
-                  headerTintColor: '#fff',
-                  headerRight: () => (
-                    <TouchableOpacity onPress={() => alert('Thông báo')}>
-                      <MaterialCommunityIcons name="bell" size={24} color="white" style={{marginRight: 15}} />
-                    </TouchableOpacity>
-                  )
-                }}
-              />
-              <Stack.Screen 
-                name="HoaToc" 
-                component={HoaTocScreen} 
-                options={{ 
-                  title: 'Hoả tốc',
                   headerStyle: { backgroundColor: '#3b82f6' }, 
                   headerTintColor: '#fff',
                   headerRight: () => (

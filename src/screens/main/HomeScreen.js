@@ -2,7 +2,6 @@ import React from 'react';
 import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, Card, Button, Avatar } from 'react-native-paper';
 import { useSelector } from 'react-redux';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import SafeAreaWrapper from '@/components/SafeAreaWrapper';
@@ -33,7 +32,7 @@ const HomeScreen = () => {
                 
                 <TouchableOpacity 
                   className="bg-white rounded-xl p-4 items-center justify-center w-[48%] shadow-sm"
-                  onPress={() => navigation.navigate('HoaToc')}
+                  onPress={() => navigation.navigate('ExpressOrder')}
                 >
                   <View className="bg-red-100 p-3 rounded-full mb-2">
                     <MaterialCommunityIcons name="flash" size={30} color="#ef4444" />

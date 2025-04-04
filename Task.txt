@@ -1,0 +1,4 @@
+02/04/2025
+[] Màn hình quét đơn kèm chụp ảnh đơn
+[] Lấy được tất cả các thông tin của đơn sau khi hoàn thành 
+[] fix UI/UX

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, Dimensions, Animated, Easing, TouchableOpacity } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -16,6 +16,9 @@ const ScannerCameraAdvanced = ({ onScan }) => {
   const [scanResult, setScanResult] = useState(null);
   const [sound, setSound] = useState(null); // Add state for sound
   const [flash, setFlash] = useState(false); // Add state for flash
+  const [cameraError, setCameraError] = useState(false);
+  const [cameraReady, setCameraReady] = useState(false);
+  const cameraRef = useRef(null);
   const scanLineAnimation = useState(new Animated.Value(0))[0];
 
   // Check camera permission and request if not granted
@@ -28,7 +31,7 @@ const ScannerCameraAdvanced = ({ onScan }) => {
         sound.unloadAsync();
       }
     };
-  }, [permission, sound]); 
+  }, [permission, sound]);
 
   const playTickSound = async () => {
     try {
@@ -36,11 +39,11 @@ const ScannerCameraAdvanced = ({ onScan }) => {
       if (sound) {
         await sound.unloadAsync();
       }
-      
+
       const { sound: newSound } = await Audio.Sound.createAsync(
         require('@assets/beep.mp3')
       );
-      setSound(newSound); 
+      setSound(newSound);
       await newSound.playAsync();
     } catch (error) {
       console.error('Error playing sound:', error);
@@ -50,27 +53,26 @@ const ScannerCameraAdvanced = ({ onScan }) => {
   const handleBarCodeScanned = async (event) => {
     // Nếu đang trong trạng thái scanned, bỏ qua
     if (scanned) {
-      console.log('Already scanned, skipping...');
       return;
     }
 
     try {
       setScanned(true);
       setScanResult({ type: event.type, data: event.data });
-      
+
       // Phát âm thanh
       await playTickSound();
-      
+
       // Gọi callback
       if (onScan) {
         onScan(event);
       }
 
-      // Tạm dừng quét 1 giây
+      // Tạm dừng quét 1.5 giây
       setTimeout(() => {
         setScanned(false);
         setScanResult(null);
-      }, 1000);
+      }, 1500);
     } catch (error) {
       console.error('Error in handleBarCodeScanned:', error);
       // Reset state in case of error
@@ -89,6 +91,27 @@ const ScannerCameraAdvanced = ({ onScan }) => {
         useNativeDriver: true,
       })
     ).start();
+  };
+
+  const handleRestartCamera = async () => {
+    try {
+      setLoading(true);
+      setCameraError(false);
+
+      if (cameraRef.current && cameraReady) {
+        await cameraRef.current.resumePreview();
+        console.log("Camera restarted successfully");
+      } else {
+        console.error("Camera is not ready or ref is null");
+        setCameraError(true);
+      } 
+
+      setLoading(false);
+    } catch (error) {
+      console.error('Error restarting camera:', error);
+      setCameraError(true);
+      setLoading(false);
+    }
   };
 
   if (loading) {
@@ -118,7 +141,7 @@ const ScannerCameraAdvanced = ({ onScan }) => {
           Không có quyền truy cập camera
         </Text>
         <View className="mt-4">
-          <Text 
+          <Text
             className="text-blue-400 font-bold p-2"
             onPress={requestPermission}
           >
@@ -139,35 +162,53 @@ const ScannerCameraAdvanced = ({ onScan }) => {
   });
 
   return (
-    <View className="h-[30vh]  bg-black overflow-hidden">
+    <View className="h-[30vh] bg-black overflow-hidden">
       <CameraView
+        ref={cameraRef}
         style={StyleSheet.absoluteFillObject}
-        facing="back" 
-        enableTorch={flash} 
+        facing="back"
+        enableTorch={flash}
         autoFocus={'on'}
         zoom={0.5}
         barcodeScannerSettings={{
           barcodeTypes: ['qr', 'code128', 'code39', 'ean13', 'ean8', 'upc'],
         }}
+        onCameraReady={() => setCameraReady(true)}
         onMountError={(error) => {
           console.error('Camera mount error:', error);
+          setCameraError(true);
         }}
         onBarcodeScanned={(event) => {
           handleBarCodeScanned(event);
         }}
       />
-      
-      {/* Flash Toggle Button */}
-      <TouchableOpacity 
-        className="absolute top-4 right-4 z-50 p-2 rounded-full bg-black/50"
-        onPress={() => setFlash(!flash)}
-      >
-        <MaterialCommunityIcons 
-          name={flash ? "flash" : "flash-off"} 
-          size={24} 
-          color={flash ? "#fbbf24" : "white"} 
-        />
-      </TouchableOpacity>
+
+      {/* Control Buttons Container */}
+      <View className="absolute top-4 left-4 z-50 space-x-2">
+        {/* Restart Camera Button */}
+        <TouchableOpacity
+          className="p-2 mb-2 rounded-full bg-black/50"
+          onPress={handleRestartCamera}
+        >
+          <MaterialCommunityIcons
+            name="camera-retake"
+            size={24}
+            color="white" 
+          />
+        </TouchableOpacity>
+
+        {/* Flash Toggle Button */}
+        <TouchableOpacity
+          className="p-2 rounded-full bg-black/50"
+          onPress={() => setFlash(!flash)}
+        >
+          <MaterialCommunityIcons
+            name={flash ? "flash" : "flash-off"}
+            size={24}
+            color={flash ? "#fbbf24" : "white"}
+          />
+        </TouchableOpacity>
+      </View>
 
       {/* Lớp phủ mờ - Tạo 4 phần xung quanh khu vực quét */}
       <View style={[StyleSheet.absoluteFillObject]}>
@@ -180,7 +221,7 @@ const ScannerCameraAdvanced = ({ onScan }) => {
           height: scanAreaTop,
           backgroundColor: 'rgba(0,0,0,0.7)',
         }} />
-        
+
         {/* Phần dưới - Điều chỉnh vị trí và kích thước */}
         <View style={{
           position: 'absolute',
@@ -190,7 +231,7 @@ const ScannerCameraAdvanced = ({ onScan }) => {
           bottom: 0, // Thêm bottom: 0 để phủ hết phần còn lại
           backgroundColor: 'rgba(0,0,0,0.7)',
         }} />
-        
+
         {/* Phần trái */}
         <View style={{
           position: 'absolute',
@@ -200,7 +241,7 @@ const ScannerCameraAdvanced = ({ onScan }) => {
           height: SCAN_AREA_HEIGHT,
           backgroundColor: 'rgba(0,0,0,0.7)',
         }} />
-        
+
         {/* Phần phải */}
         <View style={{
           position: 'absolute',
@@ -211,7 +252,7 @@ const ScannerCameraAdvanced = ({ onScan }) => {
           backgroundColor: 'rgba(0,0,0,0.7)',
         }} />
       </View>
-      
+
       {/* Khu vực quét (phần trong suốt) */}
       <View style={{
         position: 'absolute',
@@ -243,14 +284,14 @@ const ScannerCameraAdvanced = ({ onScan }) => {
             transform: [{ translateY }]
           }} />
         </View>
-        
+
         {/* Góc khung đẹp hơn */}
         <View style={{ position: 'absolute', top: -3, left: -3, width: 25, height: 25, borderTopWidth: 5, borderLeftWidth: 5, borderColor: '#3b82f6', borderTopLeftRadius: 12 }} />
         <View style={{ position: 'absolute', top: -3, right: -3, width: 25, height: 25, borderTopWidth: 5, borderRightWidth: 5, borderColor: '#3b82f6', borderTopRightRadius: 12 }} />
         <View style={{ position: 'absolute', bottom: -3, left: -3, width: 25, height: 25, borderBottomWidth: 5, borderLeftWidth: 5, borderColor: '#3b82f6', borderBottomLeftRadius: 12 }} />
         <View style={{ position: 'absolute', bottom: -3, right: -3, width: 25, height: 25, borderBottomWidth: 5, borderRightWidth: 5, borderColor: '#3b82f6', borderBottomRightRadius: 12 }} />
       </View>
-      
+
       {/* Hiển thị kết quả quét */}
       {scanResult && (
         <View style={{

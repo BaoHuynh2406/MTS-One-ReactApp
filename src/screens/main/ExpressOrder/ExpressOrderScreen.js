@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import ScanOrderStep from './ScanOrderStep';
@@ -17,7 +17,7 @@ const ExpressOrderScreen = ({ navigation }) => {
   const [phoneNumber, setPhoneNumber] = useState('');
 
   useEffect(() => {
-    // Reset state khi màn hình được mở
+    // Reset state when the screen is opened
     return () => {
       setOrderData(null);
       setScannedProducts([]);
@@ -27,10 +27,10 @@ const ExpressOrderScreen = ({ navigation }) => {
     };
   }, []);
 
-  // Xử lý lưu đơn hoả tốc
+  // Handle saving the express order
   const saveExpressOrder = async () => {
     try {
-      // Gọi API để lưu đơn hàng
+      // Simulate API call to save the order
       // await orderService.saveExpressOrder({
       //   orderData,
       //   scannedProducts,
@@ -38,50 +38,47 @@ const ExpressOrderScreen = ({ navigation }) => {
       //   phoneNumberImage,
       //   phoneNumber
       // });
-      
-      // Hiển thị thông báo thành công
-      alert('Đơn hàng hoả tốc đã được lưu thành công!');
-      
-      // Quay về màn hình chính
+
+      // Navigate back to the main screen
       navigation.goBack();
     } catch (error) {
-      console.error('Lỗi khi lưu đơn hàng:', error);
+      console.error('Error saving express order:', error);
       alert('Đã xảy ra lỗi khi lưu đơn hàng!');
     }
   };
 
-  // Render theo bước hiện tại
+  // Render the current step content
   const renderStepContent = () => {
     switch (currentStep) {
       case 'SCAN_ORDER':
         return (
-          <ScanOrderStep 
+          <ScanOrderStep
             onOrderScanned={(order) => {
               setOrderData(order);
               setCurrentStep('SCAN_PRODUCTS');
             }}
           />
         );
-      
+
       case 'SCAN_PRODUCTS':
         return (
-          <ScanProductsStep 
+          <ScanProductsStep
             orderData={orderData}
             scannedProducts={scannedProducts}
             onProductScanned={(product, isFullUpdate) => {
               if (isFullUpdate && Array.isArray(product)) {
-                // Nếu là cập nhật toàn bộ danh sách (từ QuantityInput)
+                // Update the entire list (from QuantityInput)
                 setScannedProducts(product);
               } else {
-                // Thêm một sản phẩm mới vào danh sách
-                setScannedProducts(prev => [...prev, product]);
+                // Add a new product to the list
+                setScannedProducts((prev) => [...prev, product]);
               }
             }}
             onComplete={() => setCurrentStep('PHONE_NUMBER')}
             navigation={navigation}
           />
         );
-      
+
       case 'PHONE_NUMBER':
         return (
           <PhoneNumberStep
@@ -93,7 +90,7 @@ const ExpressOrderScreen = ({ navigation }) => {
             onBack={() => setCurrentStep('SCAN_PRODUCTS')}
           />
         );
-      
+
       case 'TAKE_PHOTO':
         return (
           <TakePhotoStep
@@ -104,63 +101,41 @@ const ExpressOrderScreen = ({ navigation }) => {
             onBack={() => setCurrentStep('PHONE_NUMBER')}
           />
         );
-      
+
       default:
         return null;
     }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <MaterialCommunityIcons 
-          name="arrow-left" 
-          size={24} 
-          color="#333" 
+    <SafeAreaView className="flex-1 bg-white">
+      {/* Header */}
+      <View className="flex-row items-center justify-between px-4 py-3 bg-white">
+        <MaterialCommunityIcons
+          name="arrow-left"
+          size={24}
+          color="#333"
           onPress={() => navigation.goBack()}
         />
-        <Text style={styles.headerTitle}>Đơn hàng hoả tốc</Text>
-        <View style={{width: 24}} />
+        <Text className="text-lg font-bold text-gray-900">Đơn hàng hoả tốc</Text>
+        <View className="w-6" />
       </View>
 
-      <StepIndicator 
-        currentStep={currentStep} 
+      {/* Step Indicator */}
+      <StepIndicator
+        currentStep={currentStep}
         steps={[
           { key: 'SCAN_ORDER', label: 'Quét đơn' },
           { key: 'SCAN_PRODUCTS', label: 'Quét sản phẩm' },
           { key: 'PHONE_NUMBER', label: 'SĐT' },
-          { key: 'TAKE_PHOTO', label: 'Ảnh giao' }
-        ]} 
+          { key: 'TAKE_PHOTO', label: 'Ảnh giao' },
+        ]}
       />
-      
-      <View style={styles.content}>
-        {renderStepContent()}
-      </View>
+
+      {/* Content */}
+      <View className="flex-1">{renderStepContent()}</View>
     </SafeAreaView>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: 'white',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  content: {
-    flex: 1,
-  },
-});
-
-export default ExpressOrderScreen; 
+export default ExpressOrderScreen;

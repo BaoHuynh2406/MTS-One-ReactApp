@@ -3,6 +3,7 @@ import { View, TextInput, TouchableOpacity, Image, Platform, Dimensions, Alert, 
 import { Text, Button, IconButton } from 'react-native-paper';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import * as ImageManipulator from 'expo-image-manipulator';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -13,7 +14,7 @@ const PhoneNumberStep = ({ onComplete, onBack }) => {
     const [photo, setPhoto] = useState(null);
     const [phoneNumber, setPhoneNumber] = useState('');
     const [isManualInput, setIsManualInput] = useState(false);
-    
+
     // Kích thước khung quét
     const SCAN_FRAME_WIDTH = 300;
     const SCAN_FRAME_HEIGHT = 120;
@@ -33,17 +34,53 @@ const PhoneNumberStep = ({ onComplete, onBack }) => {
 
         try {
             setIsLoading(true);
-            const photo = await camera.takePictureAsync({
-                quality: 0.8,
-                base64: true,
+
+            // Chụp ảnh gốc
+            const originalPhoto = await camera.takePictureAsync({
+                quality: 1.0,
+                base64: false,
                 skipProcessing: Platform.OS === 'ios'
             });
 
-            if (photo) {
-                setPhoto(photo);
+            if (originalPhoto) {
+                console.log('Original photo size:', originalPhoto.width, 'x', originalPhoto.height);
+
+                // Tính toán tỷ lệ giữa ảnh chụp và kích thước hiển thị
+                const scaleFactor = originalPhoto.width / SCREEN_WIDTH;
+
+                // Tính toán vị trí và kích thước của vùng cắt
+                const scanAreaTop = (SCREEN_HEIGHT * 0.5 - SCAN_FRAME_HEIGHT) / 2;
+                const scanAreaLeft = (SCREEN_WIDTH - SCAN_FRAME_WIDTH) / 2;
+
+                // Chuyển đổi tọa độ từ màn hình sang tọa độ trong ảnh
+                const cropX = scanAreaLeft * scaleFactor;
+                const cropY = scanAreaTop * scaleFactor;
+                const cropWidth = SCAN_FRAME_WIDTH * scaleFactor;
+                const cropHeight = SCAN_FRAME_HEIGHT * scaleFactor;
+
+                console.log('Cropping coordinates:', cropX, cropY, cropWidth, cropHeight);
+
+                // Cắt ảnh theo khung quét
+                const croppedPhoto = await ImageManipulator.manipulateAsync(
+                    originalPhoto.uri,
+                    [
+                        {
+                            crop: {
+                                originX: cropX,
+                                originY: cropY,
+                                width: cropWidth,
+                                height: cropHeight
+                            }
+                        }
+                    ],
+                    { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG, base64: true }
+                );
+
+                console.log('Cropped photo size:', croppedPhoto.width, 'x', croppedPhoto.height);
+                setPhoto(croppedPhoto);
             }
         } catch (error) {
-            console.error('Error taking picture:', error);
+            console.error('Error taking or cropping picture:', error);
             Alert.alert('Lỗi', 'Không thể chụp ảnh. Vui lòng thử lại.');
         } finally {
             setIsLoading(false);
@@ -79,8 +116,8 @@ const PhoneNumberStep = ({ onComplete, onBack }) => {
                         className="absolute bottom-0 left-0 right-0 p-6"
                     >
                         <View className="flex-row justify-center">
-                            <Button 
-                                mode="contained" 
+                            <Button
+                                mode="contained"
                                 onPress={handleRetake}
                                 icon="camera-retake"
                                 className="rounded-full"
@@ -102,8 +139,8 @@ const PhoneNumberStep = ({ onComplete, onBack }) => {
                     <Text className="text-gray-600 text-center text-lg font-medium mt-4 mb-6">
                         Chúng tôi cần quyền truy cập camera để chụp ảnh số điện thoại
                     </Text>
-                    <Button 
-                        mode="contained" 
+                    <Button
+                        mode="contained"
                         onPress={requestPermission}
                         className="rounded-full"
                         buttonColor="#3b82f6"
@@ -143,7 +180,7 @@ const PhoneNumberStep = ({ onComplete, onBack }) => {
                             height: scanAreaTop,
                             backgroundColor: 'rgba(0,0,0,0.7)',
                         }} />
-                        
+
                         {/* Bottom Overlay */}
                         <View style={{
                             position: 'absolute',
@@ -153,7 +190,7 @@ const PhoneNumberStep = ({ onComplete, onBack }) => {
                             bottom: 0,
                             backgroundColor: 'rgba(0,0,0,0.7)',
                         }} />
-                        
+
                         {/* Left Overlay */}
                         <View style={{
                             position: 'absolute',
@@ -163,7 +200,7 @@ const PhoneNumberStep = ({ onComplete, onBack }) => {
                             height: SCAN_FRAME_HEIGHT,
                             backgroundColor: 'rgba(0,0,0,0.7)',
                         }} />
-                        
+
                         {/* Right Overlay */}
                         <View style={{
                             position: 'absolute',
@@ -201,7 +238,7 @@ const PhoneNumberStep = ({ onComplete, onBack }) => {
 
                     {/* Instructions and Capture Button */}
                     <View className="absolute bottom-10 left-0 right-0 p-6">
-                       
+
                         <Button
                             mode="outlined"
                             onPress={takePicture}
@@ -247,10 +284,10 @@ const PhoneNumberStep = ({ onComplete, onBack }) => {
             {isManualInput ? (
                 <View className="flex-1 p-6 justify-center">
                     <View className="bg-white rounded-3xl shadow-md p-6 border border-gray-100">
-                        <MaterialCommunityIcons 
-                            name="phone" 
-                            size={40} 
-                            color="#3b82f6" 
+                        <MaterialCommunityIcons
+                            name="phone"
+                            size={40}
+                            color="#3b82f6"
                             style={{ alignSelf: 'center', marginBottom: 16 }}
                         />
                         <Text className="text-xl font-bold text-gray-800 text-center mb-6">
@@ -263,8 +300,9 @@ const PhoneNumberStep = ({ onComplete, onBack }) => {
                             value={phoneNumber}
                             onChangeText={setPhoneNumber}
                             maxLength={15}
+                            autoFocus={true}
                         />
-                        <TouchableOpacity 
+                        <TouchableOpacity
                             onPress={handleToggleInput}
                             className="flex-row items-center justify-center mt-2"
                         >
@@ -280,7 +318,15 @@ const PhoneNumberStep = ({ onComplete, onBack }) => {
             )}
 
             {/* Footer */}
-            <View className="p-4 border-t border-gray-200">
+            <View className="p-4 border-t flex-row justify-between border-gray-200">
+                <Button
+                    mode="text"
+                    onPress={() => onComplete({ phoneNumber: null, image: null })}
+                    className="rounded-full"
+                    textColor="#3b82f6"
+                >
+                    Bỏ qua
+                </Button>
                 <Button
                     mode="contained"
                     onPress={handleContinue}
@@ -292,6 +338,7 @@ const PhoneNumberStep = ({ onComplete, onBack }) => {
                 >
                     Tiếp tục
                 </Button>
+
             </View>
         </View>
     );

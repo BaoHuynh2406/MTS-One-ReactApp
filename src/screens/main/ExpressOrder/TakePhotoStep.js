@@ -127,18 +127,17 @@ const TakePhotoStep = ({ onComplete, onBack }) => {
                         style={StyleSheet.absoluteFillObject}
                         facing="back"
                         autoFocus="on"
+                    
                     >
                         <View className="flex-1 justify-end p-6">
-                            <Text style={{color: '#fff', textAlign: 'center'}} className="text-white text-center text-lg mb-6">
-                                Đặt phiếu bàn giao vào giữa khung hình để chụp ảnh
-                            </Text>
+                           
                             <Button
                                 mode="outlined"
                                 onPress={takePicture}
                                 loading={isLoading}
                                 disabled={isLoading}
                                 icon="camera"
-                                className="rounded-full mb-6 mx-auto w-40"
+                                className="rounded-full mb-6 mx-auto w-60"
                                 textColor="white"
                                 buttonColor="transparent"
                                 style={{ borderColor: 'white' }}

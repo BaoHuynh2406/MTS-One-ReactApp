@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, Alert } from 'react-native';
-import ScannerCameraAdvanced from '../../../components/ui/ScannerCameraAdvanced';
+import ScannerCameraAdvanced from '@/components/ui/ScannerCameraAdvanced';
 
 const ScanOrderStep = ({ onOrderScanned }) => {
   const [loading, setLoading] = useState(false);

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Alert } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import ScannerCameraAdvanced from '../../../components/ui/ScannerCameraAdvanced';
-import ProductsCard from '../../../components/ui/ProductsCard';
-import CustomInputPopup from '../../../components/ui/CustomInputPopup';
+import ScannerCameraAdvanced from '@/components/ui/ScannerCameraAdvanced';
+import ProductsCard from '@/components/ui/ProductsCard';
+import CustomInputPopup from '@/components/ui/CustomInputPopup';
 import { Audio } from 'expo-av';
 
 const ScanProductsStep = ({ orderData, scannedProducts, onProductScanned, onComplete, navigation }) => {
